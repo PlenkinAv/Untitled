@@ -39,7 +39,7 @@ public:
     bool isSameTree(TreeNode* p, TreeNode* q) {
         vector<crutch> tree;
         A_R_B(p, tree);
-        for (int i=0; i<tree.size; i++)
+        for (int i=0; i<tree.size(); i++)
         {
             cout <<tree[i].value <<" " <<tree[i].exist <<"; "
         }
