@@ -1,166 +1,199 @@
 #include <stdio.h>
-#include <iostream>
-#include <string>
-
-//#include <stdlib.h>
 using namespace std;
 
-const int height = 15;
-const int width = 53;
 
-void currentFrame(char **screen);
 
-void moveUp(char **&screen){
-    char* temp;
-    temp = screen[0];
+class myString {
+    private:  
+        const int ACCURACY = 7;
+        char *value;
 
-    for (int i=0; i<height-1; i++)
-        screen[i] = screen[i+1];
+        int myStrLen (char* source);
+        int myStrLen (const char* source);
+        void myStrCpy (const char *source, char* res);
+        void myStrCpyPar (const char *source, char* res, int n);
+        void pushBack(char ch);
+        void pushFront(char ch);
+        void popBack();
 
-    screen[height-1] = temp;
+    public:
+        myString(const char *input = "\0");
+        myString(const myString &input, int n = -1);
+        ~myString();
+        void output();
+        void FloatToString (float input);
+        float StringToFloat ();  
+};
+
+
+
+int myString::myStrLen (char* source){
+        int ans = 0;
+        while (source[ans] != 0)
+            ans++;
+        return ans;
+    }
+
+int myString::myStrLen (const char* source){
+    int ans = 0;
+    while (source[ans] != 0)
+        ans++;
+    return ans;
 }
 
-void moveDown(char **&screen){
-    char* temp;
-
-    temp = screen[height-1];
-
-    for (int i=height-1; i>0; i--)
-        screen[i] = screen[i-1];
-
-    screen[0] = temp;
+void myString::myStrCpy (const char *source, char* res){
+    for (int i=0; i<=myStrLen(source); i++)
+        res[i] = source[i];
+    return;
 }
 
-void moveRight(char **&screen){
-    char temp;
-    for (int i=0; i<height; i++){
-        temp = screen[i][width-1];
-        for (int j=width-1; j>0; j--){
-            screen[i][j] = screen[i][j-1];
-        }
-        screen[i][0] = temp;
-    }
+void myString::myStrCpyPar (const char *source, char* res, int n){
+    for (int i=0; i<n; i++)
+        res[i] = source[i];
+    res[n] = 0;
+    return;
 }
 
-void moveLeft(char **&screen){
-    char temp;
-    for (int i=0; i<height; i++){
-        temp = screen[i][0];
-        for (int j=0; j<width-1; j++){
-            screen[i][j] = screen[i][j+1];
-        }
-        screen[i][width-1] = temp;
-    }
+void myString::pushBack(char ch){
+    int len = myStrLen(value);
+    char* res = new char[len+2];
+    for (int i=0; i<len; i++)
+        res[i] = value[i];
+    res[len] = ch;
+    res[len+1] = 0;
+    delete[] value;
+    value = res;
+    return;
 }
 
-void screenSaver(char *corners, int &x, int &y, char **&screen){
-    if (x>0){
-        if(corners[2]+1 <= width-1){ 
-            moveRight(screen); 
-            corners[2]++;
-            corners[0]++;
-        }
-        else{
-            x = -1;
-            moveLeft(screen);
-            corners[0]--;
-            corners[2]--;
-        };
-    }
-    else{
-        if(corners[0]-1 >= 0){ 
-            moveLeft(screen);
-            corners[0]--;
-            corners[2]--;
-        }
-        else{
-            x = 1;
-            moveRight(screen);
-            corners[0]++;
-            corners[2]++;
-        };
-    }
-
-    if (y>0){
-        if(corners[1]-1 >= 0){ 
-            moveUp(screen); 
-            corners[1]--;
-            corners[3]--;
-        }
-        else{
-            y = -1;
-            moveDown(screen);
-            corners[1]++;
-            corners[3]++;
-        };
-    }
-    else{
-        if(corners[3]+1 <= height-1){ 
-            moveDown(screen);
-            corners[1]++;
-            corners[3]++;
-        }
-        else{
-            y = 1;
-            moveUp(screen);
-            corners[1]--;
-            corners[3]--;
-        };
-    }
+void myString::pushFront(char ch){
+    int len = myStrLen(value);
+    char* res = new char[len+2];
+    for (int i=0; i<len; i++)
+        res[i+1] = value[i];
+    res[0] = ch;
+    res[len+1] = 0;
+    delete[] value;
+    value = res;
+    return;
 }
 
-void currentFrame(char **screen){
-    string str;
-    for (int i=0; i<width+2; i++) str.push_back('=');
-    str.push_back('\n');
-    for (int i=0; i<height; i++){
-        str.push_back('|');
-        for (int j=0; j<width; j++)
-            str.push_back(screen[i][j]);
-        str.push_back('|');
-        str.push_back('\n');
-    }
-    for (int i=0; i<width+2; i++) str.push_back('=');
-    str.push_back('\n');
-    cout <<str;
+void myString::popBack(){
+    int len = myStrLen(value);
+    char* res = new char[len-1];
+    for (int i=0; i<len-1; i++)
+        res[i] = value[i];
+    res[len-1] = 0;
+    delete[] value;
+    value = res;
+    return;
 }
+
+myString::myString(const char *input)
+{
+    value = new char[myStrLen(input)+1];
+    myStrCpy(input, value);
+    value[myStrLen(input)] = 0;
+}
+
+myString::myString(const myString &input, int n)
+{
+    if (n < 0) {
+        value = new char[myStrLen(input.value)];
+        myStrCpy(input.value, value);
+    } else
+    {
+        value = new char[n];
+        myStrCpyPar(input.value, value, n);
+    };
+}
+
+myString::~myString(){
+    delete[] value;
+}
+
+void myString::output(){
+    printf("%s\n", value);
+    return;
+}
+
+void myString::FloatToString (float input) {
+    myString res;
+    bool negative = false;
+    if (input < 0) {negative = true; input = -input;}
+    int int_inp = (int)input;
+    if ( int_inp == 0 ) {res.pushFront('0');}
+    while (int_inp > 0) {
+        res.pushFront(int_inp%10 + '0');
+        int_inp /= 10;
+    }
+    input -= (int)input;
+    if (input > 0) {
+        res.pushBack('.');
+        for(int i=0; i<ACCURACY; i++) {
+            input*= 10;
+            res.pushBack((int)input + '0');
+            input -= (int)input;
+        }
+        while (res.value[res.myStrLen(res.value)-1] == '0'){
+            res.popBack();
+        }
+    }
+    if (negative) {res.pushFront('-');}
+    value = res.value;
+    return;
+}
+
+float myString::StringToFloat (){
+    float res = 0;
+    bool negative = false;
+    char* iter = value;
+    if (*iter == '-') {negative = true; iter++;};
+    while ((*iter != '.') && (*iter != 0)) {
+        res *= 10;
+        res += *iter -'0';
+        iter++;
+    }
+    if(*iter == '.'){
+        float j = 1;
+        iter++;
+        while (*iter != 0) {
+            j /= 10;
+            res += (*iter-'0')*j;
+            iter++;   
+        }
+    }
+    if (negative) {res = -res;}
+    
+    return res;
+}   
 
 int main(){
-    char **screen = new char*[height];
-    for (int i=0; i<height; i++){
-        screen[i] = new char[width];
-        for (int j=0; j<width; j++)
-            screen[i][j] = ' ';
-    };
-    int x = 1, y = -1;
-    char *corners = new char[4];
-    corners[0] = 0;
-    corners[1] = 0;
-    corners[2] = 6;
-    corners[3] = 1;
+    myString empty_string;
+    myString literal("copy this part<-- (14 symbols)");
+    myString full_copy(literal);
+    myString half_copy(literal, 14);
 
-    screen[0][0] = 'f';
-    screen[0][1] = 'u';
-    screen[0][2] = 'c';
-    screen[0][3] = 'k';
-    screen[0][4] = 'i';
-    screen[0][5] = 'n';
-    screen[0][6] = 'g';
+    myString float_str_1("-123.456");
+    float str_to_float = float_str_1.StringToFloat();
 
-    screen[1][1] = 'c';
-    screen[1][2] = 'l';
-    screen[1][3] = 'o';
-    screen[1][4] = 'w';
-    screen[1][5] = 'n';
+    float float_to_str = -807.4;
+    myString float_str_2;
+    float_str_2.FloatToString(float_to_str);
 
+    printf("=====================================================\n");
+    printf("empty str: "); empty_string.output();
+    printf("literal  : "); literal.output();
+    printf("full copy: "); full_copy.output();
+    printf("half copy: "); half_copy.output();
+    printf("\n");
 
-system("pause");
-for (int i=0; i<100; i++)
- {screenSaver(corners, x, y, screen);
-    currentFrame(screen);
-    for (unsigned j=0; j<0x02FFFFFF; j++)
-        {unsigned dum = 0xEFFFFFFF;
-        dum++;}
-};system("pause");
-return 0;  
+    printf("string (to float)  : "); float_str_1.output();
+    printf("float (from string): %f\n", str_to_float);
+    printf("\n");
+
+    printf("float (to string)  : %f\n", float_to_str);
+    printf("string (from float): "); float_str_2.output();
+    printf("=====================================================\n");
+    return 0;
 }
